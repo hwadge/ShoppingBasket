@@ -1,9 +1,13 @@
-﻿namespace ShoppingBasket.Interfaces
+﻿using ShoppingBasket.Models;
+
+namespace ShoppingBasket.Interfaces
 {
     public interface IBasketDAO
     {
-        public Task<bool> CreateBasket();
+        public Task CreateBasket(Basket basket);
 
-        public Task<bool> DeleteBasket();
+        public Task DeleteBasket(int id);
+
+        public Task<int> GetTotalCost(int id);
     }
 }
