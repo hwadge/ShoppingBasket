@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace ShoppingBasket
 {
-    public class ShoppingBasket
+    public class ShoppingBasketCreator
     {
     }
 }
