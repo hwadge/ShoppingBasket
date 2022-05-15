@@ -6,6 +6,7 @@ using Moq;
 using ShoppingBasket.Interfaces;
 using Microsoft.Extensions.Logging;
 using System.Threading.Tasks;
+using System;
 
 namespace ShoppingBasketTests
 {
@@ -48,7 +49,7 @@ namespace ShoppingBasketTests
         }
 
         [Fact]
-        public async void GivenMultipleOf3BItemsInBasket_ThenPromoApplied()
+        public async Task GivenCreateBasketExceptions_ThenShouldLog()
         {
             var mockBasketItemDAO = new Mock<IBasketItemDAO>();
             var mockBasketDAO = new Mock<IBasketDAO>();
@@ -56,27 +57,17 @@ namespace ShoppingBasketTests
 
             var sut = new ShoppingBasketCreator(mockBasketDAO.Object, mockBasketItemDAO.Object, mockLogger.Object);
 
-            var items = new List<BasketItem>();
+            mockBasketDAO.Setup(x => x.CreateBasket(It.IsAny<Basket>())).Throws(new Exception());
 
-            var totalCostResult = await sut.GetTotalCost(1);
+            await sut.CreateBasket(new Basket());
 
-            mockBasketDAO.Verify(x => x.GetTotalCost(1), Times.Once);
-        }
-
-        [Fact]
-        public async Task GivenMultipleOf2DItemsInBasket_ThenPromoApplied()
-        {
-            var mockBasketItemDAO = new Mock<IBasketItemDAO>();
-            var mockBasketDAO = new Mock<IBasketDAO>();
-            var mockLogger = new Mock<ILogger<ShoppingBasketCreator>>();
-
-            var sut = new ShoppingBasketCreator(mockBasketDAO.Object, mockBasketItemDAO.Object, mockLogger.Object);
-
-            var items = new List<BasketItem>();
-
-            var totalCostResult = await sut.GetTotalCost(1);
-
-            mockBasketDAO.Verify(x => x.GetTotalCost(1), Times.Once);
+            mockLogger.Verify(x => x.Log(
+                    LogLevel.Error,
+                    It.IsAny<EventId>(),
+                    It.Is<It.IsAnyType>((o, t) => string.Equals("Create basket error!", o.ToString(), StringComparison.InvariantCultureIgnoreCase)),
+                    It.IsAny<Exception>(),
+                    It.IsAny<Func<It.IsAnyType, Exception, string>>()),
+                Times.Once);
         }
     }
 }

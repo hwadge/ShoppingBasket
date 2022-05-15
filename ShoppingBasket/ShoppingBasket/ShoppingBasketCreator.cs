@@ -90,7 +90,7 @@ namespace ShoppingBasket
             return true;
         }
 
-        public async Task<int?> GetTotalCost(int id)
+        public async Task<double?> GetTotalCost(int id)
         {
             try
             {
