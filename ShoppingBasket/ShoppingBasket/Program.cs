@@ -8,7 +8,6 @@ public class Program
     {
         //setup our DI
         var serviceProvider = new ServiceCollection()
-            .AddLogging()
             .AddDbContext<ApplicationDbContext>(o => o.UseSqlServer(@"Data Source=(localdb)\MSSQLLocalDB;Initial Catalog=LeaderBoardItem;Integrated Security=True"))
             .BuildServiceProvider();
     }
