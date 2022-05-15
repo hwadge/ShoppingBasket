@@ -2,73 +2,81 @@ using Xunit;
 using ShoppingBasket;
 using ShoppingBasket.Models;
 using System.Collections.Generic;
+using Moq;
+using ShoppingBasket.Interfaces;
+using Microsoft.Extensions.Logging;
+using System.Threading.Tasks;
 
 namespace ShoppingBasketTests
 {
     public class ShoppingBasketTests
     {
-
         [Fact]
-        public void GivenAddItemSelected_ThenItemShouldBeAdded()
+        public async Task GivenAddItemSelected_ThenItemShouldBeAdded()
         {
-            var sut = new ShoppingBasketCreator();
+            var mockBasketItemDAO = new Mock<IBasketItemDAO>();
+            var mockBasketDAO = new Mock<IBasketDAO>();
+            var mockLogger = new Mock<ILogger<ShoppingBasketCreator>>();
+
+            var sut = new ShoppingBasketCreator(mockBasketDAO.Object, mockBasketItemDAO.Object, mockLogger.Object);
 
             var items = new List<BasketItem>();
 
-            sut.AddItems(items);
+            mockBasketItemDAO.Setup(x => x.AddItems(It.IsAny<IEnumerable<BasketItem>>())).ReturnsAsync(true);
 
-            var addedItemsResult = sut.GetItems();
+            await sut.AddItems(items);
 
-            Assert.Equal(addedItemsResult, items);
-
+            mockBasketItemDAO.Verify(x => x.AddItems(It.IsAny<IEnumerable<BasketItem>>()), Times.Once);
         }
 
         [Fact]
-        public void GivenItemsInBasket_ThenTotalCostCorrectlyCalculated()
+        public async Task GivenItemsInBasket_ThenTotalCostCorrectlyCalculated()
         {
-            var sut = new ShoppingBasketCreator();
+            var mockBasketItemDAO = new Mock<IBasketItemDAO>();
+            var mockBasketDAO = new Mock<IBasketDAO>();
+            var mockLogger = new Mock<ILogger<ShoppingBasketCreator>>();
 
-            var items = new List<BasketItem>();
+            var sut = new ShoppingBasketCreator(mockBasketDAO.Object, mockBasketItemDAO.Object, mockLogger.Object);
+
+            mockBasketDAO.Setup(x => x.GetTotalCost(1)).ReturnsAsync(1);
 
             var expectedCost = 1;
 
-            sut.AddItems(items);
-
-            var totalCostResult = sut.GetTotalCost();
+            var totalCostResult = await sut.GetTotalCost(1);
 
             Assert.Equal(totalCostResult, expectedCost);
         }
 
         [Fact]
-        public void GivenMultipleOf3BItemsInBasket_ThenPromoApplied()
+        public async void GivenMultipleOf3BItemsInBasket_ThenPromoApplied()
         {
-            var sut = new ShoppingBasketCreator();
+            var mockBasketItemDAO = new Mock<IBasketItemDAO>();
+            var mockBasketDAO = new Mock<IBasketDAO>();
+            var mockLogger = new Mock<ILogger<ShoppingBasketCreator>>();
+
+            var sut = new ShoppingBasketCreator(mockBasketDAO.Object, mockBasketItemDAO.Object, mockLogger.Object);
 
             var items = new List<BasketItem>();
 
-            var expectedCost = 1;
+            var totalCostResult = await sut.GetTotalCost(1);
 
-            sut.AddItems(items);
-
-            var totalCostResult = sut.GetTotalCost();
-
-            Assert.Equal(totalCostResult, expectedCost);
+            mockBasketDAO.Verify(x => x.GetTotalCost(1), Times.Once);
         }
 
         [Fact]
-        public void GivenMultipleOf2DItemsInBasket_ThenPromoApplied()
+        public async Task GivenMultipleOf2DItemsInBasket_ThenPromoApplied()
         {
-            var sut = new ShoppingBasketCreator();
+            var mockBasketItemDAO = new Mock<IBasketItemDAO>();
+            var mockBasketDAO = new Mock<IBasketDAO>();
+            var mockLogger = new Mock<ILogger<ShoppingBasketCreator>>();
+
+            var sut = new ShoppingBasketCreator(mockBasketDAO.Object, mockBasketItemDAO.Object, mockLogger.Object);
 
             var items = new List<BasketItem>();
 
-            var expectedCost = 1;
+            var totalCostResult = await sut.GetTotalCost(1);
 
-            sut.AddItems(items);
-
-            var totalCostResult = sut.GetTotalCost();
-
-            Assert.Equal(totalCostResult, expectedCost);
+            mockBasketDAO.Verify(x => x.GetTotalCost(1), Times.Once);
         }
     }
 }

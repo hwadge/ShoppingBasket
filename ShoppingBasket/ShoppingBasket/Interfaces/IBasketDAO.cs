@@ -8,6 +8,6 @@ namespace ShoppingBasket.Interfaces
 
         public Task DeleteBasket(int id);
 
-        public Task<int> GetTotalCost(int id);
+        public Task<double> GetTotalCost(int id);
     }
 }
